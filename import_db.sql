@@ -4,9 +4,9 @@
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
-  id INTEGER PRIMARY KEY
-  fname TEXT
-  lname TEXT
+  id INTEGER PRIMARY KEY,
+  fname TEXT NOT NULL,
+  lname TEXT NOT NULL
 );
 
 INSERT INTO
@@ -22,10 +22,10 @@ VALUES
 DROP TABLE IF EXISTS questions;
 
 CREATE TABLE questions (
-  id INTEGER PRIMARY KEY
-  title TEXT NOT NULL
-  body TEXT NOT NULL
-  author_id INTEGER NOT NULL
+  id INTEGER PRIMARY KEY,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  author_id INTEGER NOT NULL,
 
   FOREIGN KEY (author_id) REFERENCES users(id)
 );
@@ -63,11 +63,11 @@ CREATE TABLE questions (
 DROP TABLE IF EXISTS question_follows;
 -- JOINS users and questions
 CREATE TABLE question_follows (
-  id INTEGER NOT NULL
-  user_id INTEGER NOT NULL
-  question_id INTEGER NOT NULL
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  question_id INTEGER NOT NULL,
 
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (question_id) REFERENCES questions(id)
 );
 
@@ -79,6 +79,10 @@ CREATE TABLE question_follows (
   VALUES
     ((SELECT id FROM users WHERE fname = 'Travis' AND lname = 'Tillotson'),
       (SELECT id FROM questions WHERE title = 'Ozzy''s question'));
+
+  INSERT INTO
+    question_follows (user_id, question_id)
+  VALUES
     ((SELECT id FROM users WHERE fname = 'Matthew' AND lname = 'Martinez'),
       (SELECT id FROM questions WHERE title = 'Ozzy''s question'));
 
@@ -87,21 +91,21 @@ CREATE TABLE question_follows (
 DROP TABLE IF EXISTS replies;
 
 CREATE TABLE replies (
-  id INTEGER PRIMARY KEY
-  question_id INTEGER NOT NULL
-  parent_reply_id INTEGER NOT NULL
-  author_id INTEGER NOT NULL
-  body TEXT NOT NULL
+  id INTEGER PRIMARY KEY,
+  question_id INTEGER NOT NULL,
+  parent_reply_id INTEGER,
+  author_id INTEGER NOT NULL,
+  body TEXT NOT NULL,
 
-  FOREIGN KEY (question_id) REFERENCES questions(id)
-  FOREIGN KEY (parent_reply_id) REFERENCES replies(id)
+  FOREIGN KEY (question_id) REFERENCES questions(id),
+  FOREIGN KEY (parent_reply_id) REFERENCES replies(id),
   FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
   INSERT INTO
     replies (question_id, parent_reply_id, author_id, body)
   VALUES
-    ((SELECT id FROM questions WHERE title = 'Travis''s question'),
+    ((SELECT id FROM questions WHERE title = 'Travis'' question'),
     NULL,
     (SELECT id FROM users WHERE fname = 'Travis' AND lname = 'Tillotson'),
     'it was in tents');
@@ -109,7 +113,7 @@ CREATE TABLE replies (
   INSERT INTO
     replies (question_id, parent_reply_id, author_id, body)
   VALUES
-    ((SELECT id FROM questions WHERE title = 'Travis''s question'),
+    ((SELECT id FROM questions WHERE title = 'Travis'' question'),
     (SELECT id FROM replies WHERE body = 'it was in tents'),
     (SELECT id FROM users WHERE fname = 'Ozzy'AND lname = 'Paniagua'),
     'It was intense?');
@@ -117,21 +121,21 @@ CREATE TABLE replies (
   INSERT INTO
     replies (question_id, parent_reply_id, author_id, body)
   VALUES
-    ((SELECT id FROM questions WHERE title = 'Travis''s question'),
+    ((SELECT id FROM questions WHERE title = 'Travis'' question'),
     (SELECT id FROM replies WHERE body = 'It was intense?'),
     (SELECT id FROM users WHERE fname = 'Matthew' AND lname = 'Martinez'),
-    'It was in tents. Cause its a circus...\nBad joke, Travis...')
+    'It was in tents Cause its a circus...\nBad joke, Travis...');
 
 
 
 DROP TABLE IF EXISTS question_likes;
 
 CREATE TABLE question_likes (
-  id INTEGER PRIMARY KEY
-  user_id INTEGER NOT NULL
-  question_id INTEGER NOT NULL
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  question_id INTEGER NOT NULL,
 
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (question_id) REFERENCES questions(id)
 );
 
